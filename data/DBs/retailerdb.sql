@@ -84,7 +84,8 @@ INSERT INTO customers (customer_id, name, email) VALUES
     (7, 'Daniel Anderson', 'daniel@example.com'),
     (8, 'Olivia Thomas', 'olivia@example.com'),
     (9, 'James Martinez', 'james@example.com'),
-    (10, 'Emma Hernandez', 'emma@example.com');
+    (10, 'Emma Hernandez', 'emma@example.com'),
+    (11, 'YASHVARDHAN', 'yashvardhan551@.com');
 
 -- Insert into orders
 INSERT INTO orders (order_id, customer_id, total_amount) VALUES
