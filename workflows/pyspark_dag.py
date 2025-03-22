@@ -9,6 +9,7 @@ from airflow.providers.google.cloud.operators.dataproc import (
     DataprocSubmitJobOperator,
 )
 
+
 # define the variables
 PROJECT_ID = "my-avd-project1"
 REGION = "us-east1"
