@@ -1,4 +1,4 @@
-from google.cloud import storage, bigquery
+from google.cloud import storage, bigquery #my
 import pandas as pd
 from pyspark.sql import SparkSession
 import datetime
@@ -8,20 +8,20 @@ import json
 spark = SparkSession.builder.appName("SupplierMySQLToLanding").getOrCreate()
 
 # Google Cloud Storage (GCS) Configuration
-GCS_BUCKET = "datalake-project-bkt-19032025"
+GCS_BUCKET = "retailer-bkt-20032025"
 LANDING_PATH = f"gs://{GCS_BUCKET}/landing/supplier-db/"
 ARCHIVE_PATH = f"gs://{GCS_BUCKET}/landing/supplier-db/archive/"
 CONFIG_FILE_PATH = f"gs://{GCS_BUCKET}/configs/supplier_config.csv"
 
 # BigQuery Configuration
-BQ_PROJECT = "avd-databricks-demo"
+BQ_PROJECT = "my-avd-project1"
 BQ_AUDIT_TABLE = f"{BQ_PROJECT}.temp_dataset.audit_log"
 BQ_LOG_TABLE = f"{BQ_PROJECT}.temp_dataset.pipeline_logs"
 BQ_TEMP_PATH = f"{GCS_BUCKET}/temp/"  
 
 # MySQL Configuration
 MYSQL_CONFIG = {
-    "url": "jdbc:mysql://34.134.165.135:3306/supplierDB?useSSL=false&allowPublicKeyRetrieval=true",
+    "url": "jdbc:mysql://34.41.102.92:3306/supplierDB?useSSL=false&allowPublicKeyRetrieval=true",
     "driver": "com.mysql.cj.jdbc.Driver",
     "user": "myuser",
     "password": "mypass"
@@ -75,7 +75,7 @@ def save_logs_to_bigquery():
 # Function to Read Config File from GCS
 def read_config_file():
     df = spark.read.csv(CONFIG_FILE_PATH, header=True)
-    log_event("INFO", "Successfully read the config file")
+    log_event("INFO", "✅ Successfully read the config file")
     return df
 
 # Function to Get Latest Watermark from BigQuery Audit Table
@@ -115,7 +115,7 @@ def move_existing_files_to_archive(table):
         storage_client.bucket(GCS_BUCKET).copy_blob(source_blob, storage_client.bucket(GCS_BUCKET), destination_blob.name)
         source_blob.delete()
 
-        log_event("INFO", f"Moved {file} to {archive_path}", table=table)
+        log_event("INFO", f"✅ Moved {file} to {archive_path}", table=table)
 
 # Function to Extract Data from MySQL and Save to GCS
 def extract_and_save_to_landing(table, load_type, watermark_col):
@@ -138,7 +138,7 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
                 .option("dbtable", query)
                 .load())
 
-        log_event("SUCCESS", f"Successfully extracted data from {table}", table=table)
+        log_event("SUCCESS", f"✅ Successfully extracted data from {table}", table=table)
 
         # Convert Spark DataFrame to JSON
         pandas_df = df.toPandas()
@@ -153,7 +153,7 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
         blob = bucket.blob(JSON_FILE_PATH)
         blob.upload_from_string(json_data, content_type="application/json")
 
-        log_event("SUCCESS", f"JSON file successfully written to gs://{GCS_BUCKET}/{JSON_FILE_PATH}", table=table)
+        log_event("SUCCESS", f"✅ JSON file successfully written to gs://{GCS_BUCKET}/{JSON_FILE_PATH}", table=table)
 
         # Insert Audit Entry
         audit_df = spark.createDataFrame([
@@ -166,10 +166,10 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
             .mode("append")
             .save())
 
-        log_event("SUCCESS", f"Audit log updated for {table}", table=table)
+        log_event("SUCCESS", f"✅ Audit log updated for {table}", table=table)
 
     except Exception as e:
-        log_event("ERROR", f"Error processing {table}: {str(e)}", table=table)
+        log_event("ERROR", f"❌Error processing {table}: {str(e)}", table=table)
 
 # Main Execution
 config_df = read_config_file()
